@@ -1,15 +1,18 @@
 #include "cbase.h"
+
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
 #include <vgui_controls/EditablePanel.h>
 #include <vgui_controls/ProgressBar.h>
 #include <vgui_controls/Label.h>
+
 #include "c_mom_player.h"
 #include "hud.h"
 #include "hudelement.h"
 #include "iclientmode.h"
 #include "ienginevgui.h"
+
 #include "mom_system_gamemode.h"
 #include "weapon/weapon_mom_stickybomblauncher.h"
 
@@ -18,6 +21,12 @@
 using namespace vgui;
 
 static MAKE_TOGGLE_CONVAR(mom_hud_sj_chargemeter_enable, "1", FCVAR_ARCHIVE, "Toggles the charge meter on or off.\n");
+static MAKE_CONVAR(mom_hud_sj_chargemeter_units, "0", FCVAR_ARCHIVE,
+                   "If above 0, shows the speed at which a sticky will be launched when charged.\n"
+                   " 0 = OFF\n"
+                   " 1 = Speed in Hammer units (900-2400u/s)\n"
+                   " 2 = Speed in percent (0% = 900u/s, 100% = 2400u/s)",
+                   0, 2);
 
 class CHudStickyCharge : public CHudElement, public EditablePanel
 {
@@ -33,7 +42,7 @@ class CHudStickyCharge : public CHudElement, public EditablePanel
   private:
     CMomentumStickybombLauncher *m_pLauncher;
     ContinuousProgressBar *m_pChargeMeter;
-    Label *m_pChargeLabel;
+    Label *m_pChargeLabel, *m_pChargeUnits, *m_pChargePercent;
 };
 
 DECLARE_HUDELEMENT(CHudStickyCharge);
@@ -44,6 +53,8 @@ CHudStickyCharge::CHudStickyCharge(const char *pElementName)
     m_pLauncher = nullptr;
     m_pChargeMeter = new ContinuousProgressBar(this, "ChargeMeter");
     m_pChargeLabel = new Label(this, "ChargeMeterLabel", "CHARGE");
+    m_pChargeUnits = new Label(this, "ChargeMeterUnits", "");
+    m_pChargePercent = new Label(this, "ChargeMeterPercent", "");
 
     LoadControlSettings("resource/ui/HudStickyCharge.res");
 }
@@ -91,11 +102,23 @@ void CHudStickyCharge::OnThink()
     if (!m_pLauncher)
         return;
 
+    // Reset the charge label when player stops charging
+    if (mom_hud_sj_chargemeter_units.GetInt() >= 0 && m_pLauncher->GetChargeBeginTime() == 0)
+    {
+        m_pChargeLabel->SetVisible(true);
+        m_pChargeUnits->SetVisible(false);
+        m_pChargePercent->SetVisible(false);
+    }
+
     // Turn charge meter red while inside start zone to indicate that stickies can't be charged
     if (!m_pLauncher->IsChargeEnabled())
     {
         m_pChargeMeter->SetFgColor(Color(192, 28, 0, 140));
         m_pChargeMeter->SetProgress(1.0f);
+
+        m_pChargeLabel->SetVisible(false);
+        m_pChargeUnits->SetVisible(false);
+        m_pChargePercent->SetVisible(false);
     }
     else
     {
@@ -112,6 +135,30 @@ void CHudStickyCharge::OnThink()
                 float flPercentCharged = min(1.0, flTimeCharged / flChargeMaxTime);
 
                 m_pChargeMeter->SetProgress(flPercentCharged);
+
+                if (mom_hud_sj_chargemeter_units.GetInt() >= 1)
+                {
+                    m_pChargeLabel->SetVisible(false);
+
+                    if (mom_hud_sj_chargemeter_units.GetInt() == 1)
+                    {
+                        char buf[64];
+                        Q_snprintf(buf, sizeof(buf), "%du/s", (int) RemapValClamped(flTimeCharged, 0.0f, 4.0f, 900.0f, 2400.0f));
+
+                        m_pChargePercent->SetVisible(false);
+                        m_pChargeUnits->SetVisible(true);
+                        m_pChargeUnits->SetText(buf);
+                    }
+                    else if (mom_hud_sj_chargemeter_units.GetInt() == 2)
+                    {
+                        char buf[64];
+                        Q_snprintf(buf, sizeof(buf), "%d%%", (int) (flPercentCharged * 100));
+
+                        m_pChargeUnits->SetVisible(false);
+                        m_pChargePercent->SetVisible(true);
+                        m_pChargePercent->SetText(buf);
+                    }
+                }
             }
             else
             {
