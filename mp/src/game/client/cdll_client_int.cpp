@@ -606,8 +606,6 @@ public:
 	virtual void					View_Render( vrect_t *rect );
 	virtual void					RenderView( const CViewSetup &view, int nClearFlags, int whatToDraw );
 	virtual void					View_Fade( ScreenFade_t *pSF );
-	
-	virtual void					SetCrosshairAngle( const QAngle& angle );
 
 	virtual void					InitSprite( CEngineSprite *pSprite, const char *loadname );
 	virtual void					ShutdownSprite( CEngineSprite *pSprite );
@@ -1630,20 +1628,6 @@ void CHLClient::LevelShutdown( void )
 
 	// string tables are cleared on disconnect from a server, so reset our global pointers to NULL
 	ResetStringTablePointers();
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: Engine received crosshair offset ( autoaim )
-// Input  : angle - 
-//-----------------------------------------------------------------------------
-void CHLClient::SetCrosshairAngle( const QAngle& angle )
-{
-	CHudCrosshair *pCrosshair = GET_HUDELEMENT( CHudCrosshair );
-	if ( pCrosshair )
-	{
-		pCrosshair->SetCrosshairAngle( angle );
-	}
 }
 
 //-----------------------------------------------------------------------------

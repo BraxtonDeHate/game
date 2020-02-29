@@ -27,7 +27,6 @@ public:
     CHudCrosshair( const char *pElementName );
     virtual ~CHudCrosshair();
 
-    virtual void	SetCrosshairAngle( const QAngle& angle );
     virtual void	SetCrosshair( CHudTexture *texture, const Color& clr );
     virtual void	ResetCrosshair();
     virtual void    DrawCrosshair( C_WeaponBase *weaponBase );
@@ -35,7 +34,7 @@ public:
     virtual bool	ShouldDraw();
 
     // any UI element that wants to be at the aim point can use this to figure out where to draw
-    static void	GetDrawPosition ( float *pX, float *pY, bool *pbBehindCamera, QAngle angleCrosshairOffset = vec3_angle );
+    static void	GetDrawPosition ( float *pX, float *pY, bool *pbBehindCamera);
 protected:
     virtual void	ApplySchemeSettings( vgui::IScheme *scheme );
     virtual void	Paint();
@@ -44,7 +43,6 @@ protected:
     CHudTexture		*m_pCrosshair;
     CHudTexture		*m_pDefaultCrosshair;
     Color			m_clrCrosshair;
-    QAngle			m_vecCrossHairOffsetAngle;
 
     CPanelAnimationVar( bool, m_bHideCrosshair, "never_draw", "false" );
 };
