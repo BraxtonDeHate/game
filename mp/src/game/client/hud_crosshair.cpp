@@ -77,8 +77,6 @@ CHudCrosshair::CHudCrosshair( const char *pElementName ) :
 
     m_clrCrosshair = Color( 0, 0, 0, 0 );
 
-    m_vecCrossHairOffsetAngle.Init();
-
     SetHiddenBits( HIDEHUD_PLAYERDEAD | HIDEHUD_CROSSHAIR );
 }
 
@@ -139,7 +137,7 @@ bool CHudCrosshair::ShouldDraw( void )
 }
 
 
-void CHudCrosshair::GetDrawPosition ( float *pX, float *pY, bool *pbBehindCamera, QAngle angleCrosshairOffset )
+void CHudCrosshair::GetDrawPosition ( float *pX, float *pY, bool *pbBehindCamera)
 {
     QAngle curViewAngles = CurrentViewAngles();
     Vector curViewOrigin = CurrentViewOrigin();
@@ -149,24 +147,6 @@ void CHudCrosshair::GetDrawPosition ( float *pX, float *pY, bool *pbBehindCamera
 
     float x = vw / 2.0f;
     float y = vh / 2.0f;
-
-    // MattB - angleCrosshairOffset is the autoaim angle.
-    // if we're not using autoaim, just draw in the middle of the 
-    // screen
-    if ( angleCrosshairOffset != vec3_angle )
-    {
-        Vector forward;
-        Vector point, screen;
-
-        // this code is wrong
-        const QAngle angles = curViewAngles + angleCrosshairOffset;
-        AngleVectors( angles, &forward );
-        VectorAdd( curViewOrigin, forward, point );
-        ScreenTransform( point, screen );
-
-        x += 0.5f * screen[0] * vw + 0.5f;
-        y += 0.5f * screen[1] * vh + 0.5f;
-    }
 
     *pX = x;
     *pY = y;
@@ -192,7 +172,7 @@ void CHudCrosshair::DrawCrosshair( CWeaponBase *weaponBase )
 
     float x, y;
     bool bBehindCamera;
-    GetDrawPosition(&x, &y, &bBehindCamera, m_vecCrossHairOffsetAngle);
+    GetDrawPosition(&x, &y, &bBehindCamera);
     
     if( bBehindCamera )
         return;
@@ -415,7 +395,7 @@ void CHudCrosshair::Paint( void )
 
     float x, y;
     bool bBehindCamera;
-    GetDrawPosition ( &x, &y, &bBehindCamera, m_vecCrossHairOffsetAngle );
+    GetDrawPosition ( &x, &y, &bBehindCamera );
 
     if( bBehindCamera )
         return;
@@ -445,14 +425,6 @@ void CHudCrosshair::Paint( void )
         iTextureW, iTextureH,
         iWidth, iHeight,
         clr );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CHudCrosshair::SetCrosshairAngle( const QAngle& angle )
-{
-    VectorCopy( angle, m_vecCrossHairOffsetAngle );
 }
 
 //-----------------------------------------------------------------------------

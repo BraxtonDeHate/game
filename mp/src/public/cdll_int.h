@@ -655,9 +655,6 @@ public:
 	// Apply screen fade directly from engine
 	virtual void			View_Fade( ScreenFade_t *pSF ) = 0;
 
-	// The engine has parsed a crosshair angle message, this function is called to dispatch the new crosshair angle
-	virtual void			SetCrosshairAngle( const QAngle& angle ) = 0;
-
 	// Sprite (.spr) model handling code
 	// Load a .spr file by name
 	virtual void			InitSprite( CEngineSprite *pSprite, const char *loadname ) = 0;
