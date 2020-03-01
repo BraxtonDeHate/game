@@ -2150,13 +2150,23 @@ int CMomentumGameMovement::TryPlayerMove(Vector *pFirstDest, trace_t *pFirstTrac
     float fSlamVol = 0.0f;
 
     float fLateralStoppingAmount = primal_velocity.Length2D() - mv->m_vecVelocity.Length2D();
-    if (fLateralStoppingAmount > PLAYER_MAX_SAFE_FALL_SPEED * 2.0f)
+    if (fLateralStoppingAmount > PLAYER_MAX_SAFE_FALL_SPEED)
     {
-        fSlamVol = 1.0f;
-    }
-    else if (fLateralStoppingAmount > PLAYER_MAX_SAFE_FALL_SPEED)
-    {
+        // If we are going to play a rough landing, make sure that the player's surface data
+        // is up to date. Otherwise, hitting a surfable slope and triggering this will play
+        // the stepsound of the last walked on surface, as by default the step surface is
+        // only updated for walkable surfaces. Here we are using the last player trace.
+        IPhysicsSurfaceProps *pPhysprops = MoveHelper()->GetSurfaceProps();
+        player->m_surfaceProps = pm.surface.surfaceProps;
+        player->m_pSurfaceData = pPhysprops->GetSurfaceData(player->m_surfaceProps);
+
         fSlamVol = 0.85f;
+
+        // Increase volume for a harder collision.
+        if (fLateralStoppingAmount > PLAYER_MAX_SAFE_FALL_SPEED * 2.0f)
+        {
+            fSlamVol = 1.0f;
+        }
     }
 
     PlayerRoughLandingEffects(fSlamVol);
