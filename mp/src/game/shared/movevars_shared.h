@@ -57,5 +57,6 @@ extern ConVar sv_considered_on_ground;
 extern ConVar sv_duck_collision_fix;
 extern ConVar sv_ground_trigger_fix;
 extern ConVar sv_edge_fix;
+extern ConVar sv_punchangle_enable;
 
 #endif // MOVEVARS_SHARED_H

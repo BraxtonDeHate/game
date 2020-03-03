@@ -136,3 +136,4 @@ MAKE_CONVAR(sv_considered_on_ground, "1.0", FCVAR_MAPPING, "Amount of units you 
 MAKE_TOGGLE_CONVAR(sv_duck_collision_fix, "1", FCVAR_MAPPING, "Fixes headbugs by updating the collision box after duck code instead of at the end of the tick. 1 = ON, 0 = OFF.\n");
 MAKE_TOGGLE_CONVAR(sv_ground_trigger_fix, "1", FCVAR_MAPPING, "Fixes being able to jump off the ground if grounded with a trigger under the player (bounces and jumpbugs). 1 = ON, 0 = OFF.\n");
 MAKE_TOGGLE_CONVAR(sv_edge_fix, "1", FCVAR_MAPPING, "Makes edgebugs more consistent and allows for bunnyhopping instead of edgebugging. 1 = ON, 0 = OFF.\n");
+MAKE_TOGGLE_CONVAR(sv_punchangle_enable, "0", FCVAR_ARCHIVE, "Toggle landing punchangle. 0 = OFF, 1 = ON\n");

@@ -52,8 +52,6 @@ ConVar sv_ladder_angle("sv_ladder_angle", "-0.707", FCVAR_REPLICATED,
 #ifndef CLIENT_DLL
 #include "env_player_surface_trigger.h"
 static ConVar dispcoll_drawplane("dispcoll_drawplane", "0");
-static MAKE_TOGGLE_CONVAR(mom_punchangle_enable, "0", FCVAR_ARCHIVE | FCVAR_REPLICATED,
-                          "Toggle landing punchangle. 0 = OFF, 1 = ON\n");
 #endif
 
 CMomentumGameMovement::CMomentumGameMovement() : m_pPlayer(nullptr) {}
@@ -81,10 +79,10 @@ void CMomentumGameMovement::PlayerRoughLandingEffects(float fvol)
         //
         // Knock the screen around a little bit, temporary effect (IF ENABLED)
         //
-        if (mom_punchangle_enable.GetBool())
+        if (sv_punchangle_enable.GetBool())
         {
             player->m_Local.m_vecPunchAngle.Set(ROLL, player->m_Local.m_flFallVelocity * 0.013 *
-                                                          mom_punchangle_enable.GetInt());
+                                                          sv_punchangle_enable.GetInt());
 
             if (player->m_Local.m_vecPunchAngle[PITCH] > 8)
             {
